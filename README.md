@@ -12,7 +12,7 @@ Nafath MFA (Multi-Factor Authentication) API provides secure user verification t
 **Required Actions**:
 - Display national ID input field
 - Handle createRequest API call
-- Show random code to user for Nafath app verification
+- Show random code to user for Nafath app verification ( returned from nafath or backend ) 
 - Implement polling mechanism for status checking
 
 #### 2. API Calls Sequence
