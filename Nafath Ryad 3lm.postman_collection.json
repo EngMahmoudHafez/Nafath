@@ -1,0 +1,199 @@
+{
+	"info": {
+		"_postman_id": "3653620a-51de-4063-a021-ae7ebec74f0d",
+		"name": "Nafath Ryad 3lm",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "41551537",
+		"_collection_link": "https://elryad-dev-squad.postman.co/workspace/Elryad-Dev-Squad~f5930b3a-6dce-41e5-8731-421960569c39/collection/41551537-3653620a-51de-4063-a021-ae7ebec74f0d?action=share&source=collection_link&creator=41551537"
+	},
+	"item": [
+		{
+			"name": "nafath test Sandbox",
+			"item": [
+				{
+					"name": "Request",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "APP-ID",
+								"value": "",
+								"type": "text"
+							},
+							{
+								"key": "APP-KEY",
+								"value": "",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nationalId\" : \"\",\n    \"service\" : \"\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}api/v1/mfa/request?local=&requestId=",
+							"host": [
+								"{{url}}api"
+							],
+							"path": [
+								"v1",
+								"mfa",
+								"request"
+							],
+							"query": [
+								{
+									"key": "local",
+									"value": ""
+								},
+								{
+									"key": "requestId",
+									"value": ""
+								}
+							]
+						},
+						"description": "# MFA Request Endpoint\n\n## Overview\n\nThis endpoint asks the client to accept the request to sign with Nafath. The API returns a random number that the client must use to complete the authentication process.\n\n## Query Parameters\n\n| Parameter | Type | Required | Description |\n| --- | --- | --- | --- |\n| `locale` | string | Yes | Language locale for the response (e.g., `en`) |\n| `requestId` | string | Yes | Unique number generated from the backend side to identify this request |\n\n## Headers\n\n| Header | Value | Description |\n| --- | --- | --- |\n| `Accept` | `application/json` | Specifies the expected response format |\n| `APP-ID` | string | Application ID obtained from the [Nafath Dashboard](https://www.rabet.sa/portal/applications) |\n| `APP-KEY` | string | Application Key obtained from the [Nafath Dashboard](https://www.rabet.sa/portal/applications) |\n\n> **⚠️ Important:** Make sure to use the correct `APP-ID` and `APP-KEY` for your environment stage (Test or Live). Using keys from the wrong environment will result in authentication failures. \n  \n\n## Body Parameters\n\nThe request body should be sent as JSON with the following parameters:\n\n| Parameter | Type | Required | Description |\n| --- | --- | --- | --- |\n| `nationalId` | string | Yes | The client's national ID number |\n| `service` | string | Yes | Service type - must be set to `RequestDigitalServicesEnrollment` (fixed value for this use case) |\n\n### Example Request Body\n\n``` json\n{\n  \"nationalId\": \"1234567890\",\n  \"service\": \"RequestDigitalServicesEnrollment\"\n}\n\n ```\n\n## Response\n\nwe will show the rondom to the client to nter in nafath app and the next endpoint  \nand use the transId for the second end point\n\n> {  \n\"transId\": \"01050000-1f06-9700-000b-4befb2bc9783\",  \n\"random\": \"97\"  \n}"
+					},
+					"response": []
+				},
+				{
+					"name": "Status",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "APP-ID",
+								"value": "",
+								"type": "default"
+							},
+							{
+								"key": "APP-KEY",
+								"value": "",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nationalId\" : \"\",\n    \"transId\": \"\",\n    \"random\": \"\" \n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}api/v1/mfa/request/status",
+							"host": [
+								"{{url}}api"
+							],
+							"path": [
+								"v1",
+								"mfa",
+								"request",
+								"status"
+							]
+						},
+						"description": "# Status Check Endpoint\n\nThis is the **second endpoint** in the Nafath authentication flow. After initiating a signature request using the Request endpoint, use this endpoint to check the status of the Nafath signature request.\n\n## Purpose\n\nThis endpoint allows you to poll and verify whether the user has completed the Nafath signature on their device. It's called after receiving the `transId` and `random` values from the initial Request endpoint.\n\n---\n\n## Authentication Flow\n\n1. **First Step**: Call the Request endpoint to initiate the Nafath signature request\n    \n2. **Second Step**: Use this Status endpoint to check if the user has completed the signature\n    \n3. Poll this endpoint until you receive a success status or timeout\n    \n\n---\n\n## Headers\n\n| Header | Type | Required | Description |\n| --- | --- | --- | --- |\n| `Accept` | string | Yes | Must be `application/json` |\n| `APP-ID` | string | Yes | Your application ID from the Nafath dashboard |\n| `APP-KEY` | string | Yes | Your application key from the Nafath dashboard |\n\n### Getting Your Credentials\n\nYou can obtain your `APP-ID` and `APP-KEY` from the Nafath dashboard:\n\n- **Dashboard URL**: [https://www.rabet.sa/portal/applications](https://www.rabet.sa/portal/applications)\n    \n\n### Environment Note\n\n⚠️ **Important**: Make sure to use the correct `APP-ID` and `APP-KEY` for your environment:\n\n- **Test Stage**: Use test credentials for development/testing\n    \n- **Live Stage**: Use production credentials for live environment\n    \n\n---\n\n## Body Parameters\n\n| Parameter | Type | Required | Description |\n| --- | --- | --- | --- |\n| `nationalId` | string | Yes | The client's national ID (same as used in the first Request endpoint) |\n| `transId` | string | Yes | Transaction ID returned from the first Request endpoint |\n| `random` | string | Yes | Random number returned from the first Request endpoint |\n\n### Example Request Body\n\n``` json\n{\n  \"nationalId\": \"1234567890\",\n  \"transId\": \"abc123xyz789\",\n  \"random\": \"987654321\"\n}\n\n ```\n\n---\n\n## Typical Usage Flow\n\n1. Call the **Request endpoint** with the user's `nationalId`\n    \n2. Receive `transId` and `random` in the response\n    \n3. User receives a notification on their Nafath app\n    \n4. **Poll this Status endpoint** with `nationalId`, `transId`, and `random`\n    \n5. Continue polling until:\n    \n    - User completes the signature (success status)\n        \n    - Request times out\n        \n    - User rejects the request\n        \n\n---\n\nResponse Data  \n\nstatus : enum  \nWAITING  \nEXPIRED  \nREJECTED  \nCOMPLETED\n\n---\n\n## Notes\n\n- This endpoint should be called **after** the initial Request endpoint\n    \n- Implement appropriate polling intervals to avoid overwhelming the server\n    \n- Handle timeout scenarios gracefully in your application\n    \n- The `transId` and `random` values are unique to each signature request"
+					},
+					"response": []
+				},
+				{
+					"name": "update Status - works on test mode only",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							},
+							{
+								"key": "APP-ID",
+								"value": "",
+								"type": "default"
+							},
+							{
+								"key": "APP-KEY",
+								"value": "",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"transId\" : \"\",\n    \"random\" : \"\",\n    \"accept\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}api/v1/mfa/request/update",
+							"host": [
+								"{{url}}api"
+							],
+							"path": [
+								"v1",
+								"mfa",
+								"request",
+								"update"
+							]
+						},
+						"description": "# MFA Update Status Endpoint\n\n## Overview\n\nThis endpoint updates the status of a Multi-Factor Authentication (MFA) request. **This endpoint works in test mode only** and is used to simulate accepting or rejecting MFA authentication requests during development and testing.\n\n## Endpoint Details\n\n- **Method:** `POST`\n    \n- **Path:** `{{sandbox_url}}api/v1/mfa/request/update`\n    \n- **Environment:** Test mode only\n    \n\n## Required Headers\n\n| Header | Type | Description |\n| --- | --- | --- |\n| `Accept` | string | Must be set to `application/json` to receive JSON responses |\n| `APP-ID` | string | Your application identifier for authentication |\n| `APP-KEY` | string | Your application key/secret for authentication |\n\n## Request Body Parameters\n\nThe request body should be sent as raw JSON with the following parameters:\n\n| Parameter | Type | Required | Description |\n| --- | --- | --- | --- |\n| `transId` | string | Yes | The transaction ID of the MFA request you want to update. This ID is typically received from the initial MFA request. |\n| `random` | string | Yes | A random value or nonce associated with the MFA request for additional security validation. |\n| `accept` | boolean | Yes | Set to `true` to accept/approve the MFA request, or `false` to reject/deny it. |\n\n### Example Request Body\n\n``` json\n{\n  \"transId\": \"abc123xyz789\",\n  \"random\": \"random_nonce_value\",\n  \"accept\": true\n}\n\n ```\n\n## When to Use This Endpoint\n\n- **Testing MFA flows** in your application without requiring actual user authentication\n    \n- **Simulating user acceptance or rejection** of MFA requests during development\n    \n- **Automated testing** of MFA-protected features\n    \n- **Development environment** integration testing\n    \n\n## Important Notes & Warnings\n\n⚠️ **Test Mode Only:** This endpoint is designed exclusively for test/development environments. It should never be used in production as it allows programmatic control over MFA decisions, which would compromise security.\n\n⚠️ **Authentication Required:** Ensure both `APP-ID` and `APP-KEY` headers are properly configured with valid credentials.\n\n⚠️ **Transaction ID Validity:** The `transId` must correspond to an active MFA request. Expired or invalid transaction IDs will result in errors.\n\n## Usage Tips\n\n1. Obtain the `transId` and `random` values from the initial MFA request response\n    \n2. Set `accept` to `true` to simulate successful MFA verification\n    \n3. Set `accept` to `false` to test error handling and rejection flows\n    \n4. Always validate the response to ensure the status update was successful"
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "sandbox_url",
+			"value": "https://rabet-nafath.api.elm.sa/nafath-sandbox/"
+		},
+		{
+			"key": "live_url",
+			"value": "https://rabet-nafath.api.elm.sa/"
+		},
+		{
+			"key": "url",
+			"value": "{{live_url}}"
+		}
+	]
+}
