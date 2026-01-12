@@ -4,6 +4,40 @@
 ## Overview
 Nafath MFA (Multi-Factor Authentication) API provides secure user verification through Saudi Arabia's Nafath service. The API allows users to authenticate using their national ID through a mobile application.
 
+
+## Configuration Requirements
+
+Add to `config/services.php`:
+```php
+'nafath' => [
+    'base_url' => env('NAFATH_BASE_URL'),
+    'app_id' => env('NAFATH_APP_ID'),
+    'app_key' => env('NAFATH_APP_KEY'),
+    'service' => env('NAFATH_SERVICE', 'RequestDigitalServicesEnrollment'),
+],
+```
+
+Add to `.env`:
+```env
+NAFATH_BASE_URL=https://nafath.api.url
+NAFATH_APP_ID=your_app_id
+NAFATH_APP_KEY=your_app_key
+NAFATH_SERVICE=RequestDigitalServicesEnrollment
+```
+
+## Flow Diagrams
+
+### Frontend Flow
+```
+User enters National ID → API: Create Request → Display Random Code → User opens Nafath App → Poll Status → Handle Result
+```
+
+### Backend Flow
+```
+Create Request: Validation → Generate UUID → Nafath API → Store DB → Return Random
+Check Status: Find Request → Nafath Status API → Update DB → Create/Link User → Return Status
+```
+
 ## Frontend Routes & Requirements
 
 ### Frontend Integration Flow
@@ -633,9 +667,10 @@ class NafathService
 
 ## Database Models
 
-### NafathRequest Model
-**Table**: `nafath_requests`
+### NafathRequest Model (optinal)
+for logs and handle the users requests in the system
 
+**Table**: `nafath_requests`
 **Fields**:
 - `national_id`: User's national ID
 - `service`: Nafath service type
@@ -659,38 +694,6 @@ class NafathService
 - `is_active`: Set to true for new users
 - `password`: Hashed password
 
-## Configuration Requirements
-
-Add to `config/services.php`:
-```php
-'nafath' => [
-    'base_url' => env('NAFATH_BASE_URL'),
-    'app_id' => env('NAFATH_APP_ID'),
-    'app_key' => env('NAFATH_APP_KEY'),
-    'service' => env('NAFATH_SERVICE', 'RequestDigitalServicesEnrollment'),
-],
-```
-
-Add to `.env`:
-```env
-NAFATH_BASE_URL=https://nafath.api.url
-NAFATH_APP_ID=your_app_id
-NAFATH_APP_KEY=your_app_key
-NAFATH_SERVICE=RequestDigitalServicesEnrollment
-```
-
-## Flow Diagrams
-
-### Frontend Flow
-```
-User enters National ID → API: Create Request → Display Random Code → User opens Nafath App → Poll Status → Handle Result
-```
-
-### Backend Flow
-```
-Create Request: Validation → Generate UUID → Nafath API → Store DB → Return Random
-Check Status: Find Request → Nafath Status API → Update DB → Create/Link User → Return Status
-```
 
 ### Status Values
 - **WAITING**: Request initiated, waiting for user action
